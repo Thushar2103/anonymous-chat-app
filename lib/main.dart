@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'package:anonymous_chat/services/config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 
 import '../screens/home.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'screens/chat_screen.dart';
 
 Future<void> main() async {
   if (!kReleaseMode) {
@@ -33,9 +36,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final GoRouter _router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const Home(),
+        ),
+        GoRoute(
+          path: '/chat/:roomId',
+          builder: (context, state) {
+            final roomId = state.uri.queryParameters['roomId'] ?? '';
+            return ChatScreen(roomId: roomId);
+          },
+        ),
+      ],
+    );
+    return MaterialApp.router(
       title: 'முடிவிலி',
-      home: Home(),
+      // home: Home(),
+      routerConfig: _router,
       debugShowCheckedModeBanner: true,
       theme: ThemeData(
           textTheme: TextTheme(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -34,15 +35,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> sendMessage(String message) async {
-    final String encrypetedMessage =
+    final String encryptedMessage =
         EncryptionDecryption.encryptMessage(message);
+
     await supabase.from('messages').insert({
       'room_id': widget.roomId,
-      'message': encrypetedMessage,
+      'message': encryptedMessage,
       'sender_id': senderId,
     });
-
-    print(senderId);
   }
 
   void scrollToBottom() {
@@ -62,32 +62,32 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget list() {
     return Container(
       decoration: BoxDecoration(color: Color(0xFFFFFFFF)),
       child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: SizedBox(
-            height: 30,
-            child: Row(
-              children: [
-                Expanded(child: SizedBox()),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: widget.roomId));
-                  },
-                  label: Text('Id'),
-                  icon: Icon(
-                    Icons.copy_rounded,
-                    color: Colors.white,
+        if (!kIsWeb)
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: SizedBox(
+              height: 30,
+              child: Row(
+                children: [
+                  Expanded(child: SizedBox()),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: widget.roomId));
+                    },
+                    label: Text('Id'),
+                    icon: Icon(
+                      Icons.copy_rounded,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
         Expanded(
           child: StreamBuilder<List<Map<String, dynamic>>>(
             stream: messageStream,
@@ -256,5 +256,27 @@ class _ChatScreenState extends State<ChatScreen> {
         )
       ]),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kIsWeb) {
+      return list();
+    } else {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Chat Room'),
+            actions: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: widget.roomId));
+                },
+                label: Text('Copy ID'),
+                icon: Icon(Icons.copy_rounded, color: Colors.white),
+              ),
+            ],
+          ),
+          body: list());
+    }
   }
 }

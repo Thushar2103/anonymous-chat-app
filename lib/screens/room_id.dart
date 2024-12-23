@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
+
 import '../screens/chat_screen.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
@@ -44,11 +47,16 @@ class _RoomIdState extends State<RoomId> {
               onPressed: () async {
                 final roomid = await createRoom();
                 await saveNewId(roomid);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChatScreen(roomId: roomid)),
-                );
+
+                if (kIsWeb) {
+                  context.go('/chat/$roomid');
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatScreen(roomId: roomid)),
+                  );
+                }
               },
               child: Text('Create Room')),
           SizedBox(
@@ -84,11 +92,15 @@ class _RoomIdState extends State<RoomId> {
                 final roomId = roomIdController.text.trim();
                 await saveNewId(roomId);
                 if (roomId.isNotEmpty) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatScreen(roomId: roomId)),
-                  );
+                  if (kIsWeb) {
+                    context.go('/chat/$roomId');
+                  } else {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChatScreen(roomId: roomId)),
+                    );
+                  }
                 }
               },
               child: Text("Join Room"),

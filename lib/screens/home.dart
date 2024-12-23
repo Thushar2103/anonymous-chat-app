@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+
 import '../components/windows_button.dart';
 import '../screens/chat_screen.dart';
 import '../screens/room_id.dart';
@@ -12,8 +16,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String? _selectedRoomId;
-
   @override
   void initState() {
     super.initState();
@@ -33,19 +35,11 @@ class _HomeState extends State<Home> {
       backgroundColor: Color(0xFFEEEEEE),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(30),
-        child: MoveWindow(
-          child: AppBar(
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: MouseRegion(
-                child: GestureDetector(
-                  onTap: () => Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Home(),
-                    ),
-                    (route) => false,
-                  ),
+        child: kIsWeb ||
+                !(Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+            ? AppBar(
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
                     'மரை',
                     style: TextStyle(
@@ -55,17 +49,48 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
+                backgroundColor: Color(0xFFEEEEEE),
+                toolbarHeight: 30,
+                elevation: 0,
+                actions: const [],
+              )
+            : MoveWindow(
+                child: AppBar(
+                  title: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: MouseRegion(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Home(),
+                          ),
+                          (route) => false,
+                        ),
+                        child: Text(
+                          'மரை',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  backgroundColor: Color(0xFFEEEEEE),
+                  toolbarHeight: 30,
+                  scrolledUnderElevation: 0,
+                  elevation: 0,
+                  actions: [
+                    if (!kIsWeb &&
+                        (Platform.isWindows ||
+                            Platform.isLinux ||
+                            Platform.isMacOS))
+                      const WindowsButton(), // Custom window buttons
+                  ],
+                ),
               ),
-            ),
-            backgroundColor: Color(0xFFEEEEEE),
-            toolbarHeight: 30,
-            scrolledUnderElevation: 0,
-            elevation: 0,
-            actions: [
-              const WindowsButton(), // Custom window buttons
-            ],
-          ),
-        ),
       ),
       body: Row(
         children: [
@@ -104,23 +129,20 @@ class _HomeState extends State<Home> {
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0, bottom: 8, top: 5),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: _selectedRoomId == null
-                    ? Navigator(
-                        initialRoute: '/roomid',
-                        onGenerateRoute: (settings) {
-                          if (settings.name == '/roomid') {
-                            return MaterialPageRoute(builder: (_) => RoomId());
-                          } else {
-                            return MaterialPageRoute(
-                                builder: (_) => ChatScreen(roomId: ''));
-                          }
-                        },
-                      )
-                    : ChatScreen(roomId: _selectedRoomId!),
-              ),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Navigator(
+                    initialRoute: '/roomid',
+                    onGenerateRoute: (settings) {
+                      if (settings.name == '/roomid') {
+                        return MaterialPageRoute(builder: (_) => RoomId());
+                      } else {
+                        return MaterialPageRoute(
+                            builder: (_) => ChatScreen(roomId: ''));
+                      }
+                    },
+                  )),
             ),
-          ),
+          )
         ],
       ),
     );
