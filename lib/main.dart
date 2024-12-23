@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+  if (!kReleaseMode) {
+    await dotenv.load(fileName: ".env");
+  }
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
       url: Config.supabaseUrl, anonKey: Config.supabaseAnon);
