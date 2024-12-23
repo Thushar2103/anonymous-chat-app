@@ -18,7 +18,7 @@ A simple and secure **Anonymous Chat App** built using **Flutter** for the front
 ## Screenshots
 
 ### Create/Join Room
-![Create Join Room](assets/screenshots/1.png)
+![Create Join Room](screenshots/1.png)
 
 ### Chat Interface
 ![Chat Interface](screenshots/2.png)
